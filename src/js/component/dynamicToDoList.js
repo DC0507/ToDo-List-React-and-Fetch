@@ -6,11 +6,12 @@ export const ToDoList = () => {
 	let [inputValue, setInputValue] = useState("");
 	//const [listLength, setListLength] = useState(0);
 
-	const addTask = () => {
-		const newTask = [tasks.length + 1, inputValue];
-
-		//setTasks(tasks.concat(inputValue));
-		setTasks([...tasks, newTask]);
+	const addTask = e => {
+		if (e.keyCode === 13 && inputValue !== "") {
+			const newTask = [tasks.length + 1, inputValue];
+			setTasks([...tasks, newTask]);
+			setInputValue("");
+		}
 	};
 
 	const deleteTask = k => {
@@ -21,16 +22,19 @@ export const ToDoList = () => {
 	return (
 		<>
 			<input
+				className="my-3"
 				type="text"
 				onChange={e => setInputValue(e.target.value)}
 				value={inputValue}
 				onKeyDown={addTask}
+				placeholder={inputValue === "" ? "Add a new task..." : ""}
 			/>
 
-			<ul>
+			<ul className="p-0">
 				{tasks.map(task => (
 					<>
 						<li
+							className="card bg-success text-left"
 							onClick={() => deleteTask(task[0])}
 							key={task[0]}
 							style={{ listStyleType: "none" }}>
@@ -40,8 +44,13 @@ export const ToDoList = () => {
 					</>
 				))}
 			</ul>
-			<small>
-				<b>{tasks.length} tasks pendings!!</b>
+			<hr style={{ borderTop: "3px dashed" }} />
+			<small className="mb-3">
+				{tasks.length > 0 ? (
+					<b>{tasks.length} tasks pendings!!</b>
+				) : (
+					<b>Nothing to do! Yuju!</b>
+				)}
 			</small>
 		</>
 	);
