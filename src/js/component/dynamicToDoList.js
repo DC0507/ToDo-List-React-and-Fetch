@@ -5,14 +5,13 @@ export const ToDoList = () => {
 	const [tasks, setTasks] = useState([]);
 	const [inputValue, setInputValue] = useState("");
 
-	useEffect(() => {
-		checkUser();
+	useEffect(async () => {
+		await checkUser();
 		getTasks();
 	}, []);
 
 	useEffect(() => {
 		updateTasks();
-		deleteAll();
 	}, [tasks]);
 
 	const checkUser = async () => {
@@ -43,15 +42,14 @@ export const ToDoList = () => {
 		console.log("Tasks:", tasks);
 	};
 
-	const deleteAll = async () => {
-		if (tasks.length == 1) {
-			const data = await fetch(url, {
-				method: "DELETE",
-				headers: {
-					"Content-Type": "application/json"
-				}
-			});
-		}
+	const deleteAll = async e => {
+		setTasks([]);
+		const data = await fetch(url, {
+			method: "DELETE",
+			headers: {
+				"Content-Type": "application/json"
+			}
+		});
 	};
 
 	const handleAddTask = async e => {
@@ -67,20 +65,43 @@ export const ToDoList = () => {
 	};
 
 	return (
-		<div>
+		<>
 			<input
+				className="my-3"
+				type="text"
 				onChange={e => setInputValue(e.target.value)}
 				onKeyUp={handleAddTask}
-				type="text"
 				placeholder={inputValue === "" ? "Add a new task..." : ""}
-				value={inputValue}></input>
-			<ul>
+				value={inputValue}
+			/>
+
+			<ul className="p-0">
 				{tasks.map((task, i) => (
-					<li onClick={() => handleDeleteTask(i)} key={i}>
+					<li
+						className="card bg-success text-left my-3"
+						style={{ listStyleType: "none" }}
+						onClick={() => handleDeleteTask(i)}
+						key={i}>
 						{task.label}
 					</li>
 				))}
 			</ul>
-		</div>
+			<hr style={{ borderTop: "3px dashed" }} />
+			<>
+				<button
+					type="button"
+					className="btn btn-danger w-50 mx-auto"
+					onClick={deleteAll}>
+					Clear List
+				</button>
+				<small className="my-3">
+					{tasks.length > 0 ? (
+						<b>{tasks.length} tasks pendings!!</b>
+					) : (
+						<b>Nothing to do! Yuju!</b>
+					)}
+				</small>
+			</>
+		</>
 	);
 };
