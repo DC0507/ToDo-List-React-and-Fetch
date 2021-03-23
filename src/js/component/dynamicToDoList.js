@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 
 export const ToDoList = () => {
 	const url = "https://assets.breatheco.de/apis/fake/todos/user/david100";
-	const [tempTasks, setTempTasks] = useState([]);
 	const [tasks, setTasks] = useState([]);
 	const [inputValue, setInputValue] = useState("");
 
@@ -10,6 +9,11 @@ export const ToDoList = () => {
 		checkUser();
 		getTasks();
 	}, []);
+
+	useEffect(() => {
+		updateTasks();
+		deleteAll();
+	}, [tasks]);
 
 	const checkUser = async () => {
 		const data = await fetch(url, {
@@ -24,7 +28,7 @@ export const ToDoList = () => {
 	const getTasks = async () => {
 		const data = await fetch(url);
 		const oldTasks = await data.json();
-		console.log(oldTasks);
+		console.log("GET:", oldTasks);
 		setTasks(oldTasks);
 	};
 
@@ -36,20 +40,30 @@ export const ToDoList = () => {
 				"Content-Type": "application/json"
 			}
 		});
+		console.log("Tasks:", tasks);
+	};
+
+	const deleteAll = async () => {
+		if (tasks.length == 1) {
+			const data = await fetch(url, {
+				method: "DELETE",
+				headers: {
+					"Content-Type": "application/json"
+				}
+			});
+		}
 	};
 
 	const handleAddTask = async e => {
 		if (e.keyCode === 13 && inputValue != "") {
-			await setTasks([...tasks, { label: inputValue, done: false }]);
-			await setInputValue("");
-			await updateTasks();
+			setTasks([...tasks, { label: inputValue, done: false }]);
+			setInputValue("");
 		}
 	};
 
 	const handleDeleteTask = async k => {
-		const newList = await tasks.filter((task, i) => i != k);
-		await setTasks(newList);
-		await updateTasks();
+		const newList = tasks.filter((task, i) => i != k);
+		setTasks(newList);
 	};
 
 	return (
